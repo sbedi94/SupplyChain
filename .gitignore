@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+.env
+final_inventory_plan.xlsx
+.vscode/
+*.pyc
+*.pyo
+*.pyd
