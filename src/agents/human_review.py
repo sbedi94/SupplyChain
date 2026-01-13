@@ -6,18 +6,30 @@ def human_review_agent(state):
     print("\nHUMAN REVIEW REQUIRED")
     print(df)
 
-    decision = input("Decision (approve / modify / reject): ").lower()
+    # Check if decision is already in state (from API)
+    decision = state.get("human_decision")
+    
+    if not decision:
+        # Only ask for input if running interactively (for CLI usage)
+        print("Waiting for approval decision from API endpoint...")
+        decision = "pending"  # Default to pending, wait for API
+    
+    decision = decision.lower() if decision else "pending"
 
     if decision == "approve":
         final = df
     elif decision == "modify":
-        factor = float(input("Adjustment factor (e.g. 1.1): "))
+        # For modify, we would need additional parameters from the API
+        factor = state.get("adjustment_factor", 1.1)
         final = df.copy()
         final["recommended_order_qty"] = (
             final["recommended_order_qty"] * factor
         ).round(0)
-    else:
+    elif decision == "reject":
         final = pd.DataFrame()
+    else:
+        # Pending state - return empty until approved via API
+        final = df
 
     return {
         "human_decision": decision,
