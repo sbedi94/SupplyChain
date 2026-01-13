@@ -77,9 +77,31 @@ python -m pytest tests/test_enterprise_scenarios.py::TestScenario4_BudgetOverrun
 python -m pytest tests/test_enterprise_scenarios.py::TestScenario5_BlackFridayPlanning -v
 ```
 
+## Running the Server & UI
+
+### Start the Server
+```bash
+python server.py
+```
+
+The server will start on `http://localhost:8000`
+
+### Access Web Interface
+Open your browser and navigate to:
+```
+http://localhost:8000
+```
+
+### API Documentation
+FastAPI provides interactive API documentation:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+See `API_DOCUMENTATION.md` for complete API endpoints and integration guide
+
 ## Running the Main Project
 
-### Execute Full Pipeline
+### Execute Full Pipeline (Command Line)
 ```bash
 python run_pipeline.py
 ```

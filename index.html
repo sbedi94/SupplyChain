@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupplyChain Planning System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1f2937;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .output {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .output-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .output-error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 SupplyChain Planning System</h1>
+            <p>Enterprise Supply Chain Optimization & Management</p>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-title">📋 Actions</div>
+                    <button class="btn btn-primary" onclick="runPipeline()" id="runBtn">▶ Run Pipeline</button>
+                    <button class="btn btn-secondary" onclick="checkStatus()">🔍 Check Status</button>
+                    <button class="btn btn-secondary" onclick="loadScenarios()">📑 Load Scenarios</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">✅ Review</div>
+                    <button class="btn btn-success" onclick="submitReview('approve')" id="approveBtn" disabled>✓ Approve</button>
+                    <button class="btn btn-danger" onclick="submitReview('reject')" id="rejectBtn" disabled>✗ Reject</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📊 Phases</div>
+                    <button class="btn btn-secondary" onclick="switchTab('forecasts')">📈 Forecasts</button>
+                    <button class="btn btn-secondary" onclick="switchTab('inventory')">📦 Inventory</button>
+                    <button class="btn btn-secondary" onclick="switchTab('suppliers')">🤝 Suppliers</button>
+                    <button class="btn btn-secondary" onclick="switchTab('logistics')">🚚 Logistics</button>
+                </div>
+            </div>
+
+            <div class="main">
+                <div class="card">
+                    <div class="card-title">⚙️ System Status</div>
+                    <div id="statusOutput" class="output">
+                        <p>System ready. Click "Run Pipeline" to start execution.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('alerts')">⚠️ Alerts</button>
+                        <button class="tab" onclick="switchTab('forecasts')">📈 Forecasts</button>
+                        <button class="tab" onclick="switchTab('inventory')">📦 Inventory</button>
+                        <button class="tab" onclick="switchTab('suppliers')">🤝 Suppliers</button>
+                        <button class="tab" onclick="switchTab('logistics')">🚚 Logistics</button>
+                        <button class="tab" onclick="switchTab('metrics')">📊 Metrics</button>
+                    </div>
+
+                    <div id="alerts" class="tab-content active">
+                        <div class="card-title">⚠️ Alerts & Escalations</div>
+                        <div id="alertsOutput">
+                            <p style="color: #999;">Run pipeline to view alerts</p>
+                        </div>
+                    </div>
+
+                    <div id="forecasts" class="tab-content">
+                        <div class="card-title">📈 Demand Forecasts</div>
+                        <div id="forecastsOutput">
+                            <p style="color: #999;">Run pipeline to view forecasts</p>
+                        </div>
+                    </div>
+
+                    <div id="inventory" class="tab-content">
+                        <div class="card-title">📦 Inventory Plan</div>
+                        <div id="inventoryOutput">
+                            <p style="color: #999;">Run pipeline to view inventory plan</p>
+                        </div>
+                    </div>
+
+                    <div id="suppliers" class="tab-content">
+                        <div class="card-title">🤝 Supplier Plan</div>
+                        <div id="suppliersOutput">
+                            <p style="color: #999;">Run pipeline to view supplier plan</p>
+                        </div>
+                    </div>
+
+                    <div id="logistics" class="tab-content">
+                        <div class="card-title">🚚 Logistics Plan</div>
+                        <div id="logisticsOutput">
+                            <p style="color: #999;">Run pipeline to view logistics plan</p>
+                        </div>
+                    </div>
+
+                    <div id="metrics" class="tab-content">
+                        <div class="card-title">📊 Performance Metrics</div>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Forecasts Generated</div>
+                                <div class="metric-value" id="metricForecasts">0</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Inventory Items</div>
+                                <div class="metric-value" id="metricInventory">0</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Procurement Items</div>
+                                <div class="metric-value" id="metricProcurement">0</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Total Alerts</div>
+                                <div class="metric-value" id="metricAlerts">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let pipelineData = null;
+
+        async function runPipeline() {
+            const btn = document.getElementById('runBtn');
+            const oldText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Running...';
+
+            try {
+                const response = await fetch(`${API_BASE}/pipeline/run`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    pipelineData = data;
+                    displayStatus('success', '✅ Pipeline executed successfully!', data);
+                    displayMetrics(data.summary);
+                    displayAlerts(data.alerts, data.escalations);
+                    
+                    // Enable review buttons
+                    document.getElementById('approveBtn').disabled = false;
+                    document.getElementById('rejectBtn').disabled = false;
+                } else {
+                    displayStatus('error', '❌ Pipeline failed: ' + data.message);
+                }
+            } catch (error) {
+                displayStatus('error', '❌ Error: ' + error.message);
+            }
+
+            btn.disabled = false;
+            btn.textContent = oldText;
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/pipeline/status`);
+                const data = await response.json();
+                displayStatus('success', '✅ System Status', data);
+            } catch (error) {
+                displayStatus('error', '❌ Error: ' + error.message);
+            }
+        }
+
+        async function loadScenarios() {
+            try {
+                const response = await fetch(`${API_BASE}/scenarios`);
+                const data = await response.json();
+                
+                let html = '<h3>Available Test Scenarios:</h3>';
+                data.scenarios.forEach(scenario => {
+                    html += `<div class="alert alert-info">
+                        <strong>${scenario.name}</strong><br>
+                        ${scenario.description}
+                    </div>`;
+                });
+                
+                document.getElementById('statusOutput').innerHTML = html;
+            } catch (error) {
+                displayStatus('error', '❌ Error: ' + error.message);
+            }
+        }
+
+        async function submitReview(decision) {
+            try {
+                const response = await fetch(`${API_BASE}/human-review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ decision })
+                });
+
+                const data = await response.json();
+                displayStatus('success', `✅ Review Submitted: ${decision.toUpperCase()}`, data);
+            } catch (error) {
+                displayStatus('error', '❌ Error: ' + error.message);
+            }
+        }
+
+        function displayStatus(type, message, data = null) {
+            const output = document.getElementById('statusOutput');
+            const className = type === 'success' ? 'output-success' : 'output-error';
+            
+            let html = `<div class="status-badge status-${type}">${message}</div>`;
+            
+            if (data) {
+                html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+            output.innerHTML = html;
+            output.className = `output ${className}`;
+        }
+
+        function displayMetrics(summary) {
+            if (summary) {
+                document.getElementById('metricForecasts').textContent = summary.forecasts_generated || 0;
+                document.getElementById('metricInventory').textContent = summary.inventory_items || 0;
+                document.getElementById('metricProcurement').textContent = summary.procurement_items || 0;
+                document.getElementById('metricAlerts').textContent = summary.total_alerts || 0;
+            }
+        }
+
+        function displayAlerts(alerts, escalations) {
+            let html = '';
+            
+            if (escalations && escalations.length > 0) {
+                html += '<h4>🚨 Escalations</h4>';
+                escalations.forEach(e => {
+                    html += `<div class="alert alert-danger">${e}</div>`;
+                });
+            }
+            
+            if (alerts && alerts.length > 0) {
+                html += '<h4>⚠️ Alerts</h4>';
+                alerts.forEach(a => {
+                    html += `<div class="alert alert-warning">${a}</div>`;
+                });
+            }
+            
+            if (!alerts && !escalations) {
+                html = '<p style="color: #999;">No alerts or escalations</p>';
+            }
+            
+            document.getElementById('alertsOutput').innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const tab = document.getElementById(tabName);
+            if (tab) {
+                tab.classList.add('active');
+            }
+            
+            // Set active tab button
+            event.target.classList.add('active');
+
+            // Populate content
+            if (pipelineData) {
+                if (tabName === 'forecasts') {
+                    document.getElementById('forecastsOutput').innerHTML = 
+                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                } else if (tabName === 'inventory') {
+                    document.getElementById('inventoryOutput').innerHTML = 
+                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                } else if (tabName === 'suppliers') {
+                    document.getElementById('suppliersOutput').innerHTML = 
+                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                } else if (tabName === 'logistics') {
+                    document.getElementById('logisticsOutput').innerHTML = 
+                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                }
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            checkStatus();
+        };
+    </script>
+</body>
+</html>

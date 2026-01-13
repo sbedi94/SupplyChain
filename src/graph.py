@@ -1,21 +1,21 @@
 
 from langgraph.graph import StateGraph, END
-from .state import ForecastState
+from state import ForecastState
 
-from .agents.data_loader import data_loader_agent
-from .agents.data_profiling import data_profiling_agent
-from .agents.feature_engineering import feature_engineering_agent
-from .agents.demand_forecasting import demand_forecasting_agent  # Phase 1
-from .agents.inventory_optimization_v2 import inventory_optimization_agent  # Phase 2
-from .agents.supplier_procurement import supplier_procurement_agent  # Phase 3
-from .agents.logistics_capacity import logistics_capacity_agent  # Phase 4
-from .agents.human_review import human_review_agent
-from .agents.evaluation import evaluation_agent
+from agents.data_loader import data_loader_agent
+from agents.data_profiling import data_profiling_agent
+from agents.feature_engineering import feature_engineering_agent
+from agents.demand_forecasting import demand_forecasting_agent  # Phase 1
+from agents.inventory_optimization_v2 import inventory_optimization_agent  # Phase 2
+from agents.supplier_procurement import supplier_procurement_agent  # Phase 3
+from agents.logistics_capacity import logistics_capacity_agent  # Phase 4
+from agents.human_review import human_review_agent
+from agents.evaluation import evaluation_agent
 
 def route_after_human(state):
     return "evaluate" if state["human_decision"] in ["approve", "modify"] else END
 
-def build_graph():
+def create_workflow():
     g = StateGraph(ForecastState)
 
     # Data Pipeline
