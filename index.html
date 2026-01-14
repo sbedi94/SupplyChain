@@ -12,163 +12,241 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2.8em;
+            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+            font-size: 1.15em;
+            opacity: 0.95;
+            font-weight: 400;
+            letter-spacing: 0.3px;
         }
 
         .content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            padding: 30px;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            padding: 35px;
         }
 
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 14px 18px;
             border: none;
-            border-radius: 5px;
-            font-size: 1em;
+            border-radius: 8px;
+            font-size: 0.95em;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 600;
+            width: 100%;
+            margin-bottom: 10px;
+            letter-spacing: 0.4px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.45);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: #f0f0f0;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ececec 100%);
             color: #333;
             border: 2px solid #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
         }
 
         .btn-secondary:hover {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .btn-secondary:active {
+            transform: translateY(-1px);
         }
 
         .btn-success {
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
         }
 
         .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+        }
+
+        .btn-success:active {
+            transform: translateY(-1px);
         }
 
         .btn-danger {
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
         }
 
         .btn-danger:hover {
-            background: #dc2626;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.45);
+        }
+
+        .btn-danger:active {
+            transform: translateY(-1px);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
         }
 
         .main {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
         .card {
-            background: #f9fafb;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
         }
 
         .card-title {
-            font-size: 1.3em;
+            font-size: 1.35em;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             color: #1f2937;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 12px;
+            letter-spacing: -0.3px;
         }
 
         .status-badge {
             display: inline-block;
             padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin: 10px 0;
+            border-radius: 24px;
+            font-size: 0.85em;
+            font-weight: 700;
+            margin: 12px 0;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .status-success {
-            background: #d1fae5;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             color: #065f46;
         }
 
         .status-error {
-            background: #fee2e2;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             color: #991b1b;
         }
 
         .status-pending {
-            background: #fef3c7;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
         }
 
         .output {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            padding: 15px;
-            max-height: 400px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 18px;
+            max-height: 450px;
             overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #333;
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 0.88em;
+            color: #e5e7eb;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .output-success {
@@ -179,64 +257,98 @@
             border-left: 4px solid #ef4444;
         }
 
+        .output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .output::-webkit-scrollbar-track {
+            background: #374151;
+            border-radius: 8px;
+        }
+
+        .output::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 8px;
+        }
+
+        .output::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
         .metrics {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
         }
 
         .metric {
             background: white;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
         }
 
         .metric-label {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #6b7280;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
 
         .metric-value {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: #1f2937;
+            font-size: 2em;
+            font-weight: 800;
+            color: #667eea;
+            letter-spacing: -1px;
         }
 
         .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 5px solid;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
         .alert-warning {
             background: #fef3c7;
-            border-left: 4px solid #f59e0b;
+            border-left-color: #f59e0b;
             color: #92400e;
         }
 
         .alert-danger {
             background: #fee2e2;
-            border-left: 4px solid #ef4444;
+            border-left-color: #ef4444;
             color: #991b1b;
         }
 
         .alert-info {
             background: #dbeafe;
-            border-left: 4px solid #3b82f6;
+            border-left-color: #3b82f6;
             color: #1e40af;
         }
 
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(102, 126, 234, 0.2);
             border-top: 3px solid #667eea;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -246,46 +358,63 @@
 
         .tabs {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0;
+            flex-wrap: wrap;
         }
 
         .metrics-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             background: white;
-            border-radius: 5px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
         .metrics-table th {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px;
+            padding: 14px 18px;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         .metrics-table td {
-            padding: 12px;
+            padding: 14px 18px;
             border-bottom: 1px solid #e5e7eb;
+            color: #374151;
         }
 
-        .metrics-table tr:hover {
+        .metrics-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .metrics-table tbody tr:hover {
             background: #f9fafb;
-            margin-bottom: 15px;
+            transition: background 0.2s ease;
         }
 
         .tab {
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
             border: none;
             background: none;
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: 600;
             color: #6b7280;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
+            margin-bottom: -2px;
+            letter-spacing: 0.3px;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
         }
 
         .tab.active {
@@ -295,23 +424,69 @@
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 968px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .card {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
         @media (max-width: 768px) {
             .content {
                 grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 20px;
             }
 
             .metrics {
                 grid-template-columns: 1fr;
             }
 
+            .header {
+                padding: 30px 20px;
+            }
+
             .header h1 {
-                font-size: 1.8em;
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .sidebar {
+                flex-direction: column;
+            }
+
+            .tabs {
+                gap: 0;
+            }
+
+            .tab {
+                flex: 1;
+                text-align: center;
             }
         }
     </style>
@@ -329,7 +504,6 @@
                     <div class="card-title">📋 Actions</div>
                     <button class="btn btn-primary" onclick="runPipeline()" id="runBtn">▶ Run Pipeline</button>
                     <button class="btn btn-secondary" onclick="checkStatus()">🔍 Check Status</button>
-                    <button class="btn btn-secondary" onclick="loadScenarios()">📑 Load Scenarios</button>
                     <button class="btn btn-secondary" onclick="downloadReport()">📈 Download Report</button>
                 </div>
 
@@ -337,6 +511,19 @@
                     <div class="card-title">✅ Review</div>
                     <button class="btn btn-success" onclick="submitReview('approve')" id="approveBtn" disabled>✓ Approve</button>
                     <button class="btn btn-danger" onclick="submitReview('reject')" id="rejectBtn" disabled>✗ Reject</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🧪 Test Cases</div>
+                    <button class="btn btn-primary" onclick="runAllTests()" id="runAllTestsBtn">▶ Run All Tests</button>
+                    <button class="btn btn-secondary" onclick="toggleTestList()" id="toggleTestBtn">📋 Show Tests</button>
+                    <div id="testList" style="display: none; margin-top: 10px; max-height: 300px; overflow-y: auto;">
+                        <button class="btn btn-secondary" onclick="runTest('scenario1')">Scenario 1: Q2 Planning</button>
+                        <button class="btn btn-secondary" onclick="runTest('scenario2')">Scenario 2: Supplier Crisis</button>
+                        <button class="btn btn-secondary" onclick="runTest('scenario3')">Scenario 3: ERP Down</button>
+                        <button class="btn btn-secondary" onclick="runTest('scenario4')">Scenario 4: Budget Overrun</button>
+                        <button class="btn btn-secondary" onclick="runTest('scenario5')">Scenario 5: Black Friday</button>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -365,6 +552,7 @@
                         <button class="tab" id="s-response" onclick="switchTab('suppliers')">🤝 Suppliers</button>
                         <button class="tab" id="l-response" onclick="switchTab('logistics')">🚚 Logistics</button>
                         <button class="tab" id="m-response" onclick="switchTab('metrics')">📊 Metrics</button>
+                        <button class="tab" id="t-response" onclick="switchTab('tests')">🧪 Tests</button>
                     </div>
 
                     <div id="alerts" class="tab-content active">
@@ -430,6 +618,14 @@
                             </div>
                         </div>
                         <div class="metrics" id="metricsOutput"></div>
+                    </div>
+
+                    <div id="tests" class="tab-content">
+                        <div class="card-title">🧪 Enterprise Test Scenarios</div>
+                        <div id="testsOutput">
+                            <p style="color: #999;">Click buttons to run tests</p>
+                        </div>
+                        <div id="testResults" style="margin-top: 20px;"></div>
                     </div>
                 </div>
             </div>
@@ -847,6 +1043,184 @@
         window.onload = function() {
             checkStatus();
         };
+
+        // Test execution functions
+        function toggleTestList() {
+            const testList = document.getElementById('testList');
+            testList.style.display = testList.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function runTest(scenario) {
+            const resultsDiv = document.getElementById('testResults');
+            const btn = event.target;
+            const oldText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Running...';
+
+            try {
+                const response = await fetch(`${API_BASE}/tests/run`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scenario_id: scenario })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayTestResults(data, resultsDiv, scenario);
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">Test failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">Error running test: ${error.message}</div>`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = oldText;
+            switchTab('tests');
+        }
+
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('testResults');
+            const btn = document.getElementById('runAllTestsBtn');
+            const oldText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Running All...';
+
+            try {
+                const response = await fetch(`${API_BASE}/tests/run`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ run_all: true })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayAllTestResults(data, resultsDiv);
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">Tests failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">Error running tests: ${error.message}</div>`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = oldText;
+            switchTab('tests');
+        }
+
+        function displayTestResults(data, resultsDiv, scenario) {
+            let html = `<div class="card">
+                <div class="card-title">✅ Test Results - ${scenario.toUpperCase()}</div>
+                <div class="metrics-table-wrapper" style="overflow-x: auto;">
+                    <table class="metrics-table">
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Duration (s)</th>
+                            <th>Details</th>
+                        </tr>`;
+
+            if (data.tests && Array.isArray(data.tests)) {
+                data.tests.forEach(test => {
+                    const statusClass = test.passed ? 'status-success' : 'status-error';
+                    const statusIcon = test.passed ? '✓' : '✗';
+                    html += `<tr>
+                        <td>${test.name}</td>
+                        <td><span class="status-badge ${statusClass}">${statusIcon} ${test.passed ? 'PASS' : 'FAIL'}</span></td>
+                        <td>${test.duration ? test.duration.toFixed(2) : 'N/A'}</td>
+                        <td>${test.message || 'Test executed'}</td>
+                    </tr>`;
+                });
+            }
+
+            html += `</table>
+                </div>
+                <div class="metrics" style="margin-top: 15px;">
+                    <div class="metric">
+                        <div class="metric-label">Total Tests</div>
+                        <div class="metric-value">${data.total_tests || 0}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Passed</div>
+                        <div class="metric-value" style="color: #10b981;">${data.passed || 0}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Failed</div>
+                        <div class="metric-value" style="color: #ef4444;">${data.failed || 0}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Success Rate</div>
+                        <div class="metric-value">${data.success_rate ? (data.success_rate * 100).toFixed(1) + '%' : '0%'}</div>
+                    </div>
+                </div>
+            </div>`;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayAllTestResults(data, resultsDiv) {
+            let html = `<div class="card">
+                <div class="card-title">✅ All Test Scenarios Results</div>
+                <div style="margin-bottom: 20px;">`;
+
+            // Summary metrics
+            html += `<div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Total Tests</div>
+                    <div class="metric-value">${data.total_tests || 0}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Passed</div>
+                    <div class="metric-value" style="color: #10b981;">${data.passed || 0}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Failed</div>
+                    <div class="metric-value" style="color: #ef4444;">${data.failed || 0}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Success Rate</div>
+                    <div class="metric-value">${data.success_rate ? (data.success_rate * 100).toFixed(1) + '%' : '0%'}</div>
+                </div>
+            </div></div>`;
+
+            // Detailed results
+            html += `<div class="metrics-table-wrapper" style="overflow-x: auto; margin-top: 20px;">
+                <table class="metrics-table">
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Test Name</th>
+                        <th>Status</th>
+                        <th>Duration (s)</th>
+                        <th>Details</th>
+                    </tr>`;
+
+            if (data.scenarios && typeof data.scenarios === 'object') {
+                Object.keys(data.scenarios).forEach(scenarioKey => {
+                    const scenario = data.scenarios[scenarioKey];
+                    if (scenario.tests && Array.isArray(scenario.tests)) {
+                        scenario.tests.forEach((test, idx) => {
+                            const statusClass = test.passed ? 'status-success' : 'status-error';
+                            const statusIcon = test.passed ? '✓' : '✗';
+                            html += `<tr>
+                                <td>${idx === 0 ? scenario.name || scenarioKey : ''}</td>
+                                <td>${test.name}</td>
+                                <td><span class="status-badge ${statusClass}">${statusIcon} ${test.passed ? 'PASS' : 'FAIL'}</span></td>
+                                <td>${test.duration ? test.duration.toFixed(2) : 'N/A'}</td>
+                                <td>${test.message || 'Test executed'}</td>
+                            </tr>`;
+                        });
+                    }
+                });
+            }
+
+            html += `</table>
+            </div>
+            </div>`;
+
+            resultsDiv.innerHTML = html;
+        }
     </script>
 </body>
 </html>
