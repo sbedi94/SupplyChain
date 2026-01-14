@@ -433,7 +433,6 @@ if __name__ == '__main__':
     print("  GET  /api/evaluation         - Get evaluation metrics")
     print("  GET  /api/scenarios          - Get test scenarios")
     print("  GET  /docs                   - API documentation (Swagger UI)")
-    print("  GET  /redoc                  - API documentation (ReDoc)")
     print("\n")
     
     uvicorn.run(app, host='0.0.0.0', port=8000)

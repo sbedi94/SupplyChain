@@ -43,7 +43,6 @@ echo   Then access the UI at: http://localhost:8001/index.html
 echo.
 echo API Documentation available at:
 echo   http://localhost:8000/docs        (Swagger UI)
-echo   http://localhost:8000/redoc       (ReDoc)
 echo.
 echo Press Ctrl+C to stop the server
 echo.
