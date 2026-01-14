@@ -9,6 +9,10 @@ import traceback
 import uvicorn
 import numpy as np
 import pandas as pd
+from pathlib import Path
+import zipfile, io
+from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
@@ -309,6 +313,15 @@ async def submit_human_review(request_body: HumanReviewRequest):
                         pipeline_state = final_result
                         pipeline_paused = False
                         
+                        excels_to_be_downloaded = ["final_inventory_plan", "forecasts", "logistics_plan", "supplier_status"]
+                        for item in excels_to_be_downloaded:
+                            df = final_result.get(item)
+                            if isinstance(df, pd.DataFrame) and not df.empty:
+                                df.to_excel(f"{item}.xlsx", index=False)
+                                print(f"\n✓ {item} exported to '{item}.xlsx'")
+                            elif isinstance(df, list) and len(df) > 0:
+                                pd.DataFrame(df).to_excel(f"{item}.xlsx", index=False)
+                                print(f"\n✓ {item} exported to '{item}.xlsx'")
                         print(f"[INFO] Pipeline completed successfully")
                         print(f"[INFO] Final state keys: {list(final_result.keys())}")
                         
@@ -348,6 +361,36 @@ async def get_evaluation():
                 "metrics": ["forecast_accuracy", "cost_optimization", "supplier_reliability", "capacity_utilization"]
             }
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/api/download-report")
+async def get_download_report():
+    """Get download report"""
+    try:
+        base_dir = Path(".")
+        xlsx_files = list(base_dir.glob("*.xlsx"))
+
+        if not xlsx_files:
+            raise HTTPException(404, "No Excel files found")
+
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for f in xlsx_files:
+                zipf.write(f, arcname=f.name)
+
+        zip_buffer.seek(0)
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": "attachment; filename=reports.zip"
+            }
+        )
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

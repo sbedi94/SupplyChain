@@ -330,6 +330,7 @@
                     <button class="btn btn-primary" onclick="runPipeline()" id="runBtn">▶ Run Pipeline</button>
                     <button class="btn btn-secondary" onclick="checkStatus()">🔍 Check Status</button>
                     <button class="btn btn-secondary" onclick="loadScenarios()">📑 Load Scenarios</button>
+                    <button class="btn btn-secondary" onclick="downloadReport()">📈 Download Report</button>
                 </div>
 
                 <div class="card">
@@ -497,6 +498,14 @@
                 });
                 
                 document.getElementById('statusOutput').innerHTML = html;
+            } catch (error) {
+                displayStatus('error', '❌ Error: ' + error.message);
+            }
+        }
+
+        async function downloadReport() {
+            try {
+                window.location.href = `${API_BASE}/download-report`;
             } catch (error) {
                 displayStatus('error', '❌ Error: ' + error.message);
             }
