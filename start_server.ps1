@@ -42,7 +42,6 @@ Write-Host "   Then access the UI at: http://localhost:8001/index.html" -Foregro
 Write-Host ""
 Write-Host "API Documentation available at:" -ForegroundColor Cyan
 Write-Host "  http://localhost:8000/docs        (Swagger UI)" -ForegroundColor Green
-Write-Host "  http://localhost:8000/redoc       (ReDoc)" -ForegroundColor Green
 Write-Host ""
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host ""
