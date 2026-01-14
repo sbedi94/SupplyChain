@@ -310,7 +310,7 @@ Evaluation (Metrics calculation)
 | `/api/metrics` | GET | Get evaluation metrics |
 | `/api/test-scenarios` | GET | Get test data |
 
-See **API_DOCUMENTATION.md** for complete details and cURL examples.
+See **Swagger** for complete details and cURL examples.
 
 ---
 
@@ -384,6 +384,6 @@ To switch LLMs, edit `src/agents/demand_forecasting.py` and toggle the commented
 ## 🆘 Need Help?
 
 1. Check **Troubleshooting** section above
-2. Review **API_DOCUMENTATION.md** for endpoint details
+2. Review **Swagger** for endpoint details
 3. Check browser console (F12) for JavaScript errors
 4. Verify both servers are running on correct ports
