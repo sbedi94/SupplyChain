@@ -284,7 +284,7 @@ async def get_escalations():
 @app.post("/api/human-review")
 async def submit_human_review(request_body: HumanReviewRequest):
     """Submit human review decision and continue pipeline"""
-    global pipeline_state
+    global pipeline_state, pipeline_paused
     try:
         decision = request_body.decision
 
@@ -298,27 +298,42 @@ async def submit_human_review(request_body: HumanReviewRequest):
         if pipeline_state:
             pipeline_state['human_decision'] = decision
             
-            # If approved, continue the pipeline to completion
-            if decision == 'approve':
+            # If approved or modified, continue the pipeline to completion
+            if decision in ['approve', 'modify']:
                 if workflow:
                     try:
-                        # Continue from current state
+                        print(f"[INFO] Continuing pipeline from human review with decision: {decision}")
+                        # Continue workflow from current state
+                        # This will execute the routing logic and continue to evaluation
                         final_result = workflow.invoke(pipeline_state)
                         pipeline_state = final_result
+                        pipeline_paused = False
+                        
+                        print(f"[INFO] Pipeline completed successfully")
+                        print(f"[INFO] Final state keys: {list(final_result.keys())}")
+                        
                     except Exception as e:
                         print(f"[ERROR] Error continuing pipeline: {e}")
+                        traceback.print_exc()
+                        raise HTTPException(status_code=500, detail=f"Error continuing pipeline: {str(e)}")
+            else:
+                # Reject - don't continue
+                pipeline_paused = False
 
         return {
             "status": "success",
-            "message": f"Decision '{decision}' recorded and pipeline {decision}d",
+            "message": f"Decision '{decision}' recorded. Pipeline {'completed' if decision in ['approve', 'modify'] else 'rejected'}",
             "timestamp": datetime.now().isoformat(),
             "decision": decision,
-            "pipeline_complete": decision == 'approve',
-            "final_state": make_serializable(pipeline_state) if decision == 'approve' and pipeline_state is not None else None
+            "pipeline_complete": decision in ['approve', 'modify'],
+            "final_state": make_serializable(pipeline_state) if decision in ['approve', 'modify'] and pipeline_state is not None else None
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"[ERROR] Error in human review: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/evaluation")

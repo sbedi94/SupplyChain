@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 from typing import Dict
 from dotenv import load_dotenv
-#from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from src.tools.forecast_cache import ForecastCache, FallbackForecaster

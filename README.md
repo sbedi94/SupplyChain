@@ -79,18 +79,84 @@ python -m pytest tests/test_enterprise_scenarios.py::TestScenario5_BlackFridayPl
 
 ## Running the Server & UI
 
-### Start the Server
+The system has two servers that need to be started:
+1. **Backend API Server** (FastAPI on port 8000)
+2. **Frontend UI Server** (Static HTTP server on port 8001)
+
+### Option 1: Windows Batch Script (Easiest)
 ```bash
+start_server.bat
+```
+This will:
+- Create virtual environment (if needed)
+- Activate it
+- Install dependencies
+- Start backend on http://localhost:8000
+
+Then open another terminal and run frontend:
+```bash
+python -m http.server 8001 --directory .
+```
+
+### Option 2: Manual Start (Windows PowerShell)
+
+**Terminal 1 - Backend Server:**
+```powershell
+# Activate virtual environment
+myenv\Scripts\Activate.ps1
+
+# Start backend (port 8000)
 python server.py
+# OR
+uvicorn server:app --host 0.0.0.0 --port 8000
 ```
 
-The server will start on `http://localhost:8000`
+**Terminal 2 - Frontend Server:**
+```powershell
+# Start frontend server (port 8001)
+python -m http.server 8001 --directory .
+```
 
-### Access Web Interface
-Open your browser and navigate to:
+### Option 3: Manual Start (macOS/Linux)
+
+**Terminal 1 - Backend Server:**
+```bash
+# Activate virtual environment
+source myenv/bin/activate
+
+# Start backend (port 8000)
+python server.py
+# OR
+uvicorn server:app --host 0.0.0.0 --port 8000
 ```
-http://localhost:8000
+
+**Terminal 2 - Frontend Server:**
+```bash
+# Start frontend server (port 8001)
+python -m http.server 8001 --directory .
 ```
+
+### Access the Application
+
+Once both servers are running:
+
+**Frontend UI**: http://localhost:8001/index.html
+
+**Backend API**: http://localhost:8000
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+### Workflow Steps
+
+1. Open http://localhost:8001/index.html in browser
+2. Click "▶ Run Pipeline" to start execution
+3. System will process through 4 phases:
+   - Data Loading & Profiling
+   - Demand Forecasting
+   - Inventory Optimization
+   - Supplier & Logistics Planning
+4. Click "✓ Approve" to continue to evaluation
+5. View results in the dashboard tabs
 
 ### API Documentation
 FastAPI provides interactive API documentation:
@@ -101,7 +167,12 @@ See `API_DOCUMENTATION.md` for complete API endpoints and integration guide
 
 ## Running the Main Project
 
-### Execute Full Pipeline (Command Line)
+### Option A: Interactive Web UI (Recommended)
+See "Running the Server & UI" section above for browser-based interface.
+
+### Option B: Command Line Pipeline Execution
+For automated batch processing without browser:
+
 ```bash
 python run_pipeline.py
 ```
@@ -113,14 +184,14 @@ This will:
 - Optimize inventory
 - Handle supplier procurement
 - Plan logistics
-- Request human review
+- Request human review (CLI input)
 - Generate final evaluation report
 
 ### Output Files
 
 After running the pipeline, check:
-- Console output for alerts and plan summary
-- Generated Excel file with the final supply chain plan
+- **Console output**: Alerts and plan summary
+- **Excel file**: `final_inventory_plan.xlsx` with detailed allocation plan
 
 ## Project Structure
 
