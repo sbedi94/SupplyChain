@@ -11,22 +11,22 @@ import os
 from datetime import datetime
 from typing import Dict
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from src.tools.forecast_cache import ForecastCache, FallbackForecaster
+from src.rag.retriever import get_supplier_context
+from src.llm.provider import llm
 
 load_dotenv()
 
 # Initialize LLM
-api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("Google API key not found")
+#api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+#api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+#if not api_key:
+#    raise ValueError("Google API key not found")
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
-    api_key=api_key
-)
+#llm = llm[].format(api_key)
 
 # Initialize cache
 forecast_cache = ForecastCache(ttl_hours=24)
@@ -35,6 +35,9 @@ PROMPT = PromptTemplate(
     input_variables=["store", "sku", "history"],
     template="""
 You are a retail demand forecasting expert.
+
+Context:
+{context}
 
 Store: {store}
 SKU: {sku}
@@ -147,12 +150,14 @@ def demand_forecasting_agent(state):
             forecast_json = cached_forecast
         else:
             cache_stats["misses"] += 1
+            context = get_supplier_context()
             print(f"→ Forecasting: Store {store}, SKU {sku} (Seasonality: {seasonality_info['pattern']})")
             
             prompt = PROMPT.format(
                 store=store,
                 sku=sku,
-                history=history_text
+                history=history_text,
+                context=context
             )
             
             try:
