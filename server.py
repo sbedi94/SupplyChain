@@ -402,6 +402,139 @@ async def not_found_handler(request, exc):
         }
     )
 
+# Test execution endpoints
+class TestRequest(BaseModel):
+    scenario_id: str = None
+    run_all: bool = False
+
+@app.post("/api/tests/run")
+async def run_tests(request: TestRequest):
+    """Execute test scenarios and return results"""
+    import subprocess
+    import json
+    from datetime import datetime
+    
+    try:
+        if request.run_all:
+            # Run all tests
+            cmd = ['python', 'tests/test_enterprise_scenarios.py']
+        else:
+            # Run specific scenario test
+            cmd = ['python', '-m', 'unittest', f'tests.test_enterprise_scenarios.TestScenario{request.scenario_id.split("scenario")[1].capitalize()}_*', '-v']
+        
+        # Execute tests
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=os.path.dirname(__file__))
+        
+        # Parse test output
+        output = result.stdout + result.stderr
+        test_results = parse_test_output(output, request.run_all, request.scenario_id)
+        
+        return {
+            "status": "success",
+            "timestamp": datetime.now().isoformat(),
+            **test_results
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+def parse_test_output(output, run_all, scenario_id):
+    """Parse unittest output to extract test results"""
+    import re
+    
+    # Extract summary line (e.g., "Ran 25 tests in 203.020s")
+    ran_match = re.search(r'Ran (\d+) tests in ([\d.]+)s', output)
+    
+    # Extract pass/fail counts
+    failed_match = re.search(r'FAILED \(failures=(\d+), errors=(\d+)\)', output)
+    passed_match = re.search(r'OK', output)
+    
+    total_tests = int(ran_match.group(1)) if ran_match else 0
+    duration = float(ran_match.group(2)) if ran_match else 0
+    
+    if failed_match:
+        failures = int(failed_match.group(1))
+        errors = int(failed_match.group(2))
+        passed = total_tests - failures - errors
+        success_rate = passed / total_tests if total_tests > 0 else 0
+    elif passed_match:
+        passed = total_tests
+        failures = 0
+        errors = 0
+        success_rate = 1.0
+    else:
+        passed = 0
+        failures = 0
+        errors = total_tests
+        success_rate = 0
+    
+    # Extract individual test results
+    test_pattern = r'(\w+.*?) \((.*?)\) \.\.\. (ok|FAIL|ERROR)'
+    test_matches = re.findall(test_pattern, output)
+    
+    tests = []
+    for match in test_matches:
+        test_name, test_class, status = match
+        tests.append({
+            "name": test_name,
+            "class": test_class,
+            "passed": status == 'ok',
+            "status": status,
+            "message": f"Test {status.lower()}"
+        })
+    
+    if run_all:
+        # Group by scenario
+        scenarios = {}
+        scenario_names = {
+            'scenario1': 'Q2 Inventory Planning',
+            'scenario2': 'Supplier Crisis',
+            'scenario3': 'ERP System Down',
+            'scenario4': 'Budget Overrun',
+            'scenario5': 'Black Friday Planning'
+        }
+        
+        for test in tests:
+            scenario = None
+            for s_id, s_name in scenario_names.items():
+                if s_id in test['class'].lower():
+                    scenario = s_id
+                    break
+            
+            if scenario:
+                if scenario not in scenarios:
+                    scenarios[scenario] = {
+                        "name": scenario_names[scenario],
+                        "tests": []
+                    }
+                scenarios[scenario]["tests"].append(test)
+        
+        return {
+            "total_tests": total_tests,
+            "passed": passed,
+            "failed": failures + errors,
+            "success_rate": success_rate,
+            "duration": duration,
+            "scenarios": scenarios,
+            "raw_output": output
+        }
+    else:
+        # Single scenario
+        scenario_id_num = scenario_id.split("scenario")[1] if scenario_id else "1"
+        return {
+            "total_tests": total_tests,
+            "passed": passed,
+            "failed": failures + errors,
+            "success_rate": success_rate,
+            "duration": duration,
+            "tests": tests,
+            "scenario_id": scenario_id,
+            "raw_output": output
+        }
+
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
     """Handle 500 errors"""
@@ -432,6 +565,7 @@ if __name__ == '__main__':
     print("  POST /api/human-review       - Submit human review")
     print("  GET  /api/evaluation         - Get evaluation metrics")
     print("  GET  /api/scenarios          - Get test scenarios")
+    print("  POST /api/tests/run          - Run test scenarios (individual or all)")
     print("  GET  /docs                   - API documentation (Swagger UI)")
     print("\n")
     
