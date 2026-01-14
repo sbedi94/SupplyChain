@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 from typing import Dict, List
+from src.llm.provider import llm
 
 
 def inventory_optimization_agent(state):
@@ -94,23 +95,43 @@ def inventory_optimization_agent(state):
     print(f"  - Budget utilization: {avg_cost_ratio*100:.1f}%")
     
     if budget_exceeded:
-        print(f"  ⚠ BUDGET OVERRUN DETECTED!")
-        
-        # Scenario 4a: Implement cost reduction strategy
-        print(f"\n→ Applying cost reduction strategy...")
-        
-        # Reduce safety stock to save costs
-        reduction_factor = BUDGET_LIMIT / total_cost * 0.95  # 95% of budget
-        
-        for idx, row in inventory_df.iterrows():
-            reduced_qty = row["recommended_order_qty"] * reduction_factor
-            reduced_cost = reduced_qty * UNIT_COST
-            inventory_df.at[idx, "recommended_order_qty"] = round(reduced_qty, 0)
-            inventory_df.at[idx, "total_cost"] = round(reduced_cost, 2)
-        
-        new_total_cost = inventory_df["total_cost"].sum()
-        alerts.append(f"COST REDUCTION: Reduced quantities by {(1-reduction_factor)*100:.1f}% to fit budget. New total: ${new_total_cost:,.2f}")
-        print(f"  ✓ New total cost: ${new_total_cost:,.2f}")
+        decision = decide_inventory_strategy(
+        total_cost=total_cost,
+        budget_limit=BUDGET_LIMIT,
+        utilization=avg_cost_ratio
+        )
+
+        strategy = decision["strategy"]
+        alerts.append(f"STRATEGY SELECTED: {strategy} – {decision['reason']}")  
+
+        if strategy == "REDUCE_SAFETY_STOCK":
+            reduction_factor = BUDGET_LIMIT / total_cost * 0.95
+
+            inventory_df["recommended_order_qty"] = (
+                inventory_df["recommended_order_qty"] * reduction_factor
+            ).round(0)
+
+            inventory_df["total_cost"] = (
+                inventory_df["recommended_order_qty"] * UNIT_COST
+            ).round(2)
+
+        elif strategy == "PRIORITIZE_HIGH_DEMAND":
+            inventory_df = inventory_df.sort_values(
+                by="mean_daily_demand", ascending=False
+            )
+
+            running_cost = 0
+            for idx, row in inventory_df.iterrows():
+                item_cost = row["recommended_order_qty"] * UNIT_COST
+                if running_cost + item_cost <= BUDGET_LIMIT:
+                    running_cost += item_cost
+                else:
+                    inventory_df.at[idx, "recommended_order_qty"] = 0
+                    inventory_df.at[idx, "total_cost"] = 0
+
+        elif strategy == "ALLOW_OVERRUN":
+            alerts.append("Budget overrun accepted to preserve service levels")
+  
     
     budget_constraints = {
         "limit": BUDGET_LIMIT,
@@ -127,3 +148,31 @@ def inventory_optimization_agent(state):
         "budget_constraints": budget_constraints,
         "budget_alerts": alerts
     }
+
+
+
+def decide_inventory_strategy(total_cost, budget_limit, utilization):
+    prompt = f"""
+        You are a senior inventory planner.
+
+        Budget summary:
+        - Budget limit: {budget_limit}
+        - Planned cost: {total_cost}
+        - Utilization: {utilization*100:.1f}%
+
+        Choose ONE strategy:
+        1. REDUCE_SAFETY_STOCK
+        2. PRIORITIZE_HIGH_DEMAND
+        3. ALLOW_OVERRUN
+
+        Return JSON only:
+        {{ "strategy": "...", "reason": "short explanation" }}
+        """
+    try:
+        response = llm.invoke(prompt).content
+        return eval(response)
+    except Exception:
+        return {
+            "strategy": "REDUCE_SAFETY_STOCK",
+            "reason": "Fallback strategy"
+        }
