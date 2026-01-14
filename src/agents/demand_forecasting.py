@@ -115,6 +115,22 @@ def demand_forecasting_agent(state):
     Scenario 2: Seasonality detected - apply surge planning
     Scenario 3: LLM fails - fallback to statistical methods
     """
+    """alerts = list(state.get("alerts",[]))
+    forecasts: dict[str, float] = {}
+    print("state {}".format(state))
+    if state["raw_data"] is None:
+        
+        fallback = FallbackForecaster.simple_average_forecast(
+            history=pd.DataFrame(),
+            horizon=7
+        )
+        avg_forecast = sum(fallback.values()) / len(fallback)
+        return {
+            "forecasts": pd.DataFrame(forecasts),
+            "forecast_cache": forecast_cache.get_stats(),
+            "forecast_alerts": alerts
+        }"""
+        
     
     df = state["raw_data"]
     forecasts = []
