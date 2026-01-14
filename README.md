@@ -4,6 +4,22 @@ An AI-powered supply chain optimization platform that uses LangGraph with multi-
 
 ---
 
+## 📌 Business Challenge (Context)
+
+**GlobalRetail operates 500 stores with 50,000 SKUs.** Current siloed decision-making results in:
+- **15% stockouts** → $8M/year revenue loss
+- **20% overstock** → $15M tied up in capital
+
+**This system solves it by:**
+- 🤖 Coordinating multiple AI agents for demand forecasting, inventory optimization, supplier management, and logistics
+- 👤 Requiring human approval for critical decisions ($100K+ budgets, supplier outages, capacity issues)
+- 🌐 Operating at enterprise scale (500 stores × 50K SKUs)
+- 📉 Reducing stockouts via 95% service level targeting + safety stock optimization
+- 📈 Reducing overstock via budget constraints + intelligent strategy selection
+- 🔄 Providing graceful degradation when LLM APIs fail
+
+---
+
 ## 🎯 Quick Start (2 Minutes)
 
 ### Windows Users (Easiest)
@@ -147,7 +163,6 @@ Once both servers are running:
 | **http://localhost:8001/index.html** | Main dashboard |
 | **http://localhost:8000** | API base URL |
 | **http://localhost:8000/docs** | API Swagger UI |
-| **http://localhost:8000/redoc** | API ReDoc documentation |
 
 ---
 

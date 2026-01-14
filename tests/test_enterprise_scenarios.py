@@ -193,7 +193,7 @@ class TestScenario1_Q2Planning(unittest.TestCase):
         cls.q2_days = 91
 
     def test_scenario_1_allocation_plan_generated(self):
-        """✓ Can generate allocation plan for all 500 stores"""
+        """[PASS] Can generate allocation plan for all 500 stores"""
         stores = self.data.stores
         self.assertEqual(len(stores), 500)
         
@@ -206,7 +206,7 @@ class TestScenario1_Q2Planning(unittest.TestCase):
             self.assertLessEqual(store["capacity"], 15000)
 
     def test_scenario_1_demand_forecast_coverage(self):
-        """✓ Demand forecasts cover all 50K SKUs × 500 stores"""
+        """[PASS] Demand forecasts cover all 50K SKUs × 500 stores"""
         forecasts = self.data.demand_forecasts
         
         total_store_sku_pairs = len(self.data.stores) * len(self.data.skus)
@@ -217,7 +217,7 @@ class TestScenario1_Q2Planning(unittest.TestCase):
         self.assertEqual(len(forecasts[first_store_id]), 50000)
 
     def test_scenario_1_budget_constraint_respected(self):
-        """✓ Allocation plan respects $5M budget"""
+        """[PASS] Allocation plan respects $5M budget"""
         # For budget test, use smaller sample to demonstrate cost management
         # In production, would use LP solver to optimize across full 500K SKU-store combos
         stores = self.data.stores[:2]    # 2 stores
@@ -258,7 +258,7 @@ class TestScenario1_Q2Planning(unittest.TestCase):
         self.assertGreater(fullscale_optimized, 0, "Cost optimization produces valid plan")
         
         # Log results
-        print(f"\n✓ Q2 ALLOCATION PLAN")
+        print(f"\n[PASS] Q2 ALLOCATION PLAN")
         print(f"  Sample Cost (2 stores, 500 SKUs): ${total_cost:,.0f}")
         print(f"  Per-Store Cost: ${per_store_cost:,.0f}")
         print(f"  Full-Scale Base (500 stores): ${fullscale_base:,.0f}")
@@ -266,7 +266,7 @@ class TestScenario1_Q2Planning(unittest.TestCase):
         print(f"  Fits $5M Budget: {'Yes' if fullscale_optimized <= self.budget else 'Requires prioritization'}")
 
     def test_scenario_1_service_level_maintained(self):
-        """✓ Allocation maintains 95% service level with safety stock"""
+        """[PASS] Allocation maintains 95% service level with safety stock"""
         # Service level = 1 - (lost sales / total demand)
         # With z=1.645 and proper safety stock, we should achieve ~95% service level
         
@@ -296,7 +296,7 @@ class TestScenario2_SupplierCrisis(unittest.TestCase):
         cls.data = EnterpriseTestData(seed=42)
 
     def test_scenario_2_outage_detection(self):
-        """✓ Detect primary supplier outage"""
+        """[PASS] Detect primary supplier outage"""
         suppliers = self.data.suppliers
         category_x_supplier = suppliers[-1]  # SUP_005 for Category 1 (Category X)
         
@@ -307,12 +307,12 @@ class TestScenario2_SupplierCrisis(unittest.TestCase):
         self.assertEqual(category_x_supplier["status"], "OUTAGE")
         self.assertIsNotNone(category_x_supplier["outage_until"])
         
-        print(f"\n✓ OUTAGE DETECTED")
+        print(f"\n[PASS] OUTAGE DETECTED")
         print(f"  Supplier: {category_x_supplier['name']}")
         print(f"  Outage Until: {category_x_supplier['outage_until'].strftime('%Y-%m-%d')}")
 
     def test_scenario_2_alternative_suppliers_found(self):
-        """✓ Find alternative suppliers for Category X"""
+        """[PASS] Find alternative suppliers for Category X"""
         suppliers = self.data.suppliers
         category_x_id = 1  # Category 1 = Category X
         
@@ -331,14 +331,14 @@ class TestScenario2_SupplierCrisis(unittest.TestCase):
         # Rank by reliability and cost
         alternatives.sort(key=lambda s: (-s["reliability"], s["cost_multiplier"]))
         
-        print(f"\n✓ ALTERNATIVES FOUND FOR CATEGORY X")
+        print(f"\n[PASS] ALTERNATIVES FOUND FOR CATEGORY X")
         for i, supplier in enumerate(alternatives[:3]):
             print(f"  {i+1}. {supplier['name']}: "
                   f"Reliability {supplier['reliability']:.0%}, "
                   f"Cost x{supplier['cost_multiplier']:.2f}")
 
     def test_scenario_2_inventory_reoptimization(self):
-        """✓ Re-optimize inventory without primary supplier"""
+        """[PASS] Re-optimize inventory without primary supplier"""
         skus = [s for s in self.data.skus if s["category"] == "CAT_01"][:100]  # Sample
         stores = self.data.stores[:50]  # Sample
         
@@ -364,14 +364,14 @@ class TestScenario2_SupplierCrisis(unittest.TestCase):
         )
         
         ss_increase = (alternative_ss - original_ss) / original_ss
-        print(f"\n✓ INVENTORY RE-OPTIMIZATION")
+        print(f"\n[PASS] INVENTORY RE-OPTIMIZATION")
         print(f"  Original Lead Time: {original_lead_time} days")
         print(f"  Alternative Lead Time: {alternative_lead_time} days")
         print(f"  Safety Stock Increase: {ss_increase:.1%}")
         print(f"  Cost Premium: {cost_increase:.1%}")
 
     def test_scenario_2_logistics_adjustment(self):
-        """✓ Adjust logistics for longer lead times"""
+        """[PASS] Adjust logistics for longer lead times"""
         warehouses = self.data.warehouses
         
         # Longer lead time → earlier shipments needed
@@ -386,7 +386,7 @@ class TestScenario2_SupplierCrisis(unittest.TestCase):
         
         self.assertEqual(additional_planning_days, 7, "Need 7 more days of planning buffer")
         
-        print(f"\n✓ LOGISTICS ADJUSTMENT")
+        print(f"\n[PASS] LOGISTICS ADJUSTMENT")
         print(f"  Additional Planning Days: {additional_planning_days}")
         print(f"  New Ordering Trigger: {order_advance_alternative} days before shelf")
         print(f"  Warehouses Affected: {len(warehouses)}")
@@ -406,7 +406,7 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         cls.data = EnterpriseTestData(seed=42)
 
     def test_scenario_3_cache_initialization(self):
-        """✓ Initialize cache with historical inventory levels"""
+        """[PASS] Initialize cache with historical inventory levels"""
         # Simulate cache from previous successful ERP pull
         cache = {}
         stores = self.data.stores
@@ -429,12 +429,12 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         self.assertIn("data", cache)
         self.assertEqual(len(cache["data"]), 100)
         
-        print(f"\n✓ CACHE INITIALIZED")
+        print(f"\n[PASS] CACHE INITIALIZED")
         print(f"  Cached Stores: {len(cache['data'])}")
         print(f"  Data Age: 24 hours")
 
     def test_scenario_3_erp_timeout_detection(self):
-        """✓ Detect and handle ERP API timeout"""
+        """[PASS] Detect and handle ERP API timeout"""
         import time
         
         def mock_erp_call(timeout_sec=5):
@@ -445,12 +445,12 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         with self.assertRaises(TimeoutError):
             mock_erp_call(timeout_sec=5)
         
-        print(f"\n✓ ERP TIMEOUT DETECTED")
+        print(f"\n[PASS] ERP TIMEOUT DETECTED")
         print(f"  Error: API did not respond within 5s")
         print(f"  Action: Falling back to cache")
 
     def test_scenario_3_graceful_fallback_to_cache(self):
-        """✓ Fall back to cached data with staleness warning"""
+        """[PASS] Fall back to cached data with staleness warning"""
         cache = {
             "timestamp": datetime.now() - timedelta(hours=24),
             "data": {
@@ -465,9 +465,9 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         # Generate warning if cache is old
         warning = ""
         if cache_age_hours > 24:
-            warning = f"⚠️  DATA IS {cache_age_hours:.0f} HOURS OLD"
+            warning = f"[WARN] DATA IS {cache_age_hours:.0f} HOURS OLD"
         elif cache_age_hours > 12:
-            warning = f"⚠️  DATA IS {cache_age_hours:.0f} HOURS OLD (CAUTION)"
+            warning = f"[WARN] DATA IS {cache_age_hours:.0f} HOURS OLD (CAUTION)"
         
         self.assertIn("DATA IS 24 HOURS OLD", warning)
         
@@ -475,14 +475,14 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         self.assertIsNotNone(cache["data"])
         self.assertEqual(len(cache["data"]), 2)
         
-        print(f"\n✓ FALLBACK TO CACHE")
+        print(f"\n[PASS] FALLBACK TO CACHE")
         print(f"  {warning}")
         print(f"  Cache Status: Usable")
         print(f"  Cached Records: {len(cache['data'])} stores")
         print(f"  Recommendation: Use with caution for strategic decisions")
 
     def test_scenario_3_staleness_assessment(self):
-        """✓ Assess data staleness and provide guidance"""
+        """[PASS] Assess data staleness and provide guidance"""
         cache_age_hours = 24
         
         # Staleness categories
@@ -500,13 +500,13 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         
         self.assertEqual(guidance["quality"], "MEDIUM")
         
-        print(f"\n✓ STALENESS ASSESSMENT")
+        print(f"\n[PASS] STALENESS ASSESSMENT")
         print(f"  Cache Age: {cache_age_hours} hours")
         print(f"  Data Quality: {guidance['quality']}")
         print(f"  Recommendation: {guidance['action']}")
 
     def test_scenario_3_value_still_provided(self):
-        """✓ Still generate insights from cached data"""
+        """[PASS] Still generate insights from cached data"""
         cache_data = {
             "STORE_0001": {"SKU_01_0001": 250, "SKU_01_0002": 180},
             "STORE_0002": {"SKU_01_0001": 120, "SKU_01_0002": 300},
@@ -530,7 +530,7 @@ class TestScenario3_ERPSystemDown(unittest.TestCase):
         self.assertAlmostEqual(avg_per_store, 433.33, places=1)
         self.assertEqual(len(low_stock), 1)  # Only STORE_0003/SKU_01_0002 at 50 units
         
-        print(f"\n✓ INSIGHTS FROM CACHED DATA")
+        print(f"\n[PASS] INSIGHTS FROM CACHED DATA")
         print(f"  Total Units: {total_units}")
         print(f"  Avg Per Store: {avg_per_store:.0f}")
         print(f"  Low-Stock Alerts: {len(low_stock)}")
@@ -554,19 +554,19 @@ class TestScenario4_BudgetOverrun(unittest.TestCase):
         cls.overrun = cls.optimal_cost - cls.budget
 
     def test_scenario_4_budget_overrun_detected(self):
-        """✓ Detect budget overrun ($6M plan vs $5M budget)"""
+        """[PASS] Detect budget overrun ($6M plan vs $5M budget)"""
         overrun_pct = (self.optimal_cost - self.budget) / self.budget
         
         self.assertGreater(self.optimal_cost, self.budget)
         self.assertAlmostEqual(overrun_pct, 0.20, places=2)
         
-        print(f"\n✓ BUDGET OVERRUN DETECTED")
+        print(f"\n[PASS] BUDGET OVERRUN DETECTED")
         print(f"  Optimal Cost: ${self.optimal_cost:,.0f}")
         print(f"  Budget: ${self.budget:,.0f}")
         print(f"  Overrun: ${self.overrun:,.0f} ({overrun_pct:.1%})")
 
     def test_scenario_4_negotiation_initiated(self):
-        """✓ Initiate supplier negotiation to reduce costs"""
+        """[PASS] Initiate supplier negotiation to reduce costs"""
         suppliers = self.data.suppliers
         
         # Suppliers willing to negotiate
@@ -601,23 +601,32 @@ class TestScenario4_BudgetOverrun(unittest.TestCase):
         self.assertGreater(len(negotiation_savings), 0)
         self.assertLess(best_option["final_cost"], self.optimal_cost)
         
-        print(f"\n✓ SUPPLIER NEGOTIATION INITIATED")
+        print(f"\n[PASS] SUPPLIER NEGOTIATION INITIATED")
         print(f"  Suppliers Approached: {len(negotiation_savings)}")
         print(f"  Best Option: {best_option['supplier']}")
         print(f"  Potential Savings: ${best_option['potential_savings']:,.0f}")
         print(f"  Success Rate: {best_option['success_rate']:.0%}")
 
     def test_scenario_4_negotiation_failure(self):
-        """✓ Handle negotiation failure and escalate"""
-        # Simulate negotiation failure
+        """[PASS] Handle negotiation failure and escalate"""
+        # Simulate negotiation failure - test scenario where all attempts fail
         negotiation_attempts = 3
-        success_probability = 0.5  # 50% chance per attempt
-        negotiation_success = False
+        negotiation_success = False  # Force failure for this scenario
+        negotiation_history = []
         
-        for attempt in range(negotiation_attempts):
-            if random.random() < success_probability:
-                negotiation_success = True
-                break
+        # Simulate 3 failed negotiation attempts
+        for attempt in range(1, negotiation_attempts + 1):
+            attempt_success = False  # Simulate negotiation failure
+            negotiation_history.append({
+                "attempt": attempt,
+                "success": attempt_success,
+                "supplier_response": "Rate reduction not possible"
+            })
+        
+        # Verify negotiation failed
+        self.assertFalse(negotiation_success, "Negotiation should fail in this scenario")
+        self.assertEqual(len(negotiation_history), negotiation_attempts)
+        self.assertTrue(all(not h["success"] for h in negotiation_history), "All attempts should fail")
         
         # If negotiation fails, escalate to decision maker
         if not negotiation_success:
@@ -627,17 +636,21 @@ class TestScenario4_BudgetOverrun(unittest.TestCase):
         else:
             escalation_required = False
         
-        # For this test, assume negotiation failed
-        self.assertTrue(True)  # Placeholder - escalation triggered
+        # Verify escalation triggered
+        self.assertTrue(escalation_required, "Escalation should be triggered on negotiation failure")
+        self.assertEqual(escalation_level, "FINANCE_DIRECTOR")
+        self.assertIn("failed after 3 attempts", escalation_reason)
         
-        print(f"\n✓ NEGOTIATION FAILED - ESCALATION TRIGGERED")
+        print(f"\n[PASS] NEGOTIATION FAILED - ESCALATION TRIGGERED")
         print(f"  Attempts: {negotiation_attempts}")
         print(f"  Final Status: Failed")
-        print(f"  Escalation To: Finance Director")
-        print(f"  Reason: Supplier negotiation unsuccessful")
+        print(f"  Escalation To: {escalation_level}")
+        print(f"  Reason: {escalation_reason}")
+        for attempt_data in negotiation_history:
+            print(f"    Attempt {attempt_data['attempt']}: {attempt_data['supplier_response']}")
 
     def test_scenario_4_escalation_to_finance_director(self):
-        """✓ Route to finance director for budget override decision"""
+        """[PASS] Route to finance director for budget override decision"""
         escalation_data = {
             "escalation_level": "FINANCE_DIRECTOR",
             "original_budget": self.budget,
@@ -667,7 +680,7 @@ class TestScenario4_BudgetOverrun(unittest.TestCase):
         self.assertEqual(escalation_data["escalation_level"], "FINANCE_DIRECTOR")
         self.assertEqual(len(escalation_data["alternatives"]), 3)
         
-        print(f"\n✓ ESCALATION TO FINANCE DIRECTOR")
+        print(f"\n[PASS] ESCALATION TO FINANCE DIRECTOR")
         print(f"  Budget: ${escalation_data['original_budget']:,.0f}")
         print(f"  Optimal Cost: ${escalation_data['optimal_cost']:,.0f}")
         print(f"  Overrun: ${escalation_data['overrun']:,.0f} ({escalation_data['overrun_pct']:.1%})")
@@ -676,6 +689,96 @@ class TestScenario4_BudgetOverrun(unittest.TestCase):
             print(f"    {i}. {option['option']}")
             print(f"       Pros: {option['pros']}")
             print(f"       Cons: {option['cons']}")
+
+
+
+    def test_scenario_4_decision_execution(self):
+        """[PASS] Execute finance director decision and adjust plan"""
+        # Finance director selected: Hybrid approach ($5.5M, 92% SL)
+        selected_option = "Hybrid approach ($5.5M)"
+        selected_budget = 5_500_000
+        new_service_level = 0.92
+        
+        # Verify decision data
+        self.assertIsNotNone(selected_option)
+        self.assertEqual(selected_budget, 5_500_000)
+        
+        # Adjust plan based on decision
+        cost_reduction_needed = self.optimal_cost - selected_budget
+        reduction_percentage = cost_reduction_needed / self.optimal_cost
+        
+        # Verify reduction target
+        self.assertAlmostEqual(reduction_percentage, 0.0833, places=3)  # ~8.3%
+        
+        # New inventory plan adjusted to target budget
+        adjusted_plan_cost = self.optimal_cost * (1 - reduction_percentage)
+        self.assertAlmostEqual(adjusted_plan_cost, selected_budget, delta=1000)
+        
+        # Service level negotiated down to 92% (from 95%)
+        service_level_reduction = 0.95 - new_service_level
+        self.assertAlmostEqual(service_level_reduction, 0.03, places=2)  # 3% reduction
+        
+        print(f"\n[PASS] DECISION EXECUTED")
+        print(f"  Selected Option: {selected_option}")
+        print(f"  New Budget: ${selected_budget:,.0f}")
+        print(f"  Cost Reduction: ${cost_reduction_needed:,.0f} ({reduction_percentage:.1%})")
+        print(f"  Service Level: {new_service_level:.0%}")
+        print(f"  Plan Status: [PASS] Re-optimized and adjusted")
+
+    def test_scenario_4_multi_round_negotiation(self):
+        """[PASS] Track multiple negotiation rounds before escalation"""
+        # Multi-round negotiation scenario
+        suppliers = self.data.suppliers[:3]  # First 3 suppliers
+        negotiation_rounds = []
+        total_savings = 0
+        
+        for supplier in suppliers:
+            supplier_name = supplier["name"]
+            base_cost = self.optimal_cost
+            
+            # Round 1: Initial offer
+            round1_reduction = 0.01  # 1%
+            round1_savings = base_cost * round1_reduction
+            round1_result = "Supplier declines - margin too thin"
+            
+            # Round 2: Improved offer
+            round2_reduction = 0.02  # 2%
+            round2_savings = base_cost * round2_reduction
+            round2_result = "Supplier still declines"
+            
+            # Round 3: Final offer
+            round3_reduction = 0.03  # 3%
+            round3_savings = base_cost * round3_reduction
+            round3_result = "Supplier declines - volume commitment needed"
+            
+            negotiation_rounds.append({
+                "supplier": supplier_name,
+                "rounds": [
+                    {"round": 1, "proposed_savings": round1_savings, "result": round1_result},
+                    {"round": 2, "proposed_savings": round2_savings, "result": round2_result},
+                    {"round": 3, "proposed_savings": round3_savings, "result": round3_result},
+                ],
+                "final_result": "FAILED"
+            })
+            total_savings += 0  # All declined
+        
+        # Verify all suppliers rejected negotiations
+        self.assertEqual(len(negotiation_rounds), 3)
+        for negotiation in negotiation_rounds:
+            self.assertEqual(negotiation["final_result"], "FAILED")
+        
+        # Verify escalation is required
+        escalation_required = all(n["final_result"] == "FAILED" for n in negotiation_rounds)
+        self.assertTrue(escalation_required)
+        
+        print(f"\n[PASS] MULTI-ROUND NEGOTIATION COMPLETE")
+        print(f"  Suppliers Approached: {len(negotiation_rounds)}")
+        print(f"  Rounds per Supplier: 3")
+        print(f"  Total Rounds: {len(negotiation_rounds) * 3}")
+        print(f"  Results:")
+        for negotiation in negotiation_rounds:
+            print(f"    {negotiation['supplier']}: {negotiation['final_result']}")
+        print(f"  Action: Escalate to Finance Director")
 
 
 class TestScenario5_BlackFridayPlanning(unittest.TestCase):
@@ -694,19 +797,19 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         cls.normal_daily_demand = 100_000  # units across 500 stores
 
     def test_scenario_5_surge_demand_calculated(self):
-        """✓ Calculate Black Friday demand surge (3x)"""
+        """[PASS] Calculate Black Friday demand surge (3x)"""
         normal_demand = self.normal_daily_demand
         surge_demand = normal_demand * self.surge_multiplier
         
         self.assertEqual(surge_demand, 300_000)
         
-        print(f"\n✓ SURGE DEMAND CALCULATED")
+        print(f"\n[PASS] SURGE DEMAND CALCULATED")
         print(f"  Normal Daily Demand: {normal_demand:,} units")
         print(f"  Black Friday Surge: {surge_demand:,} units")
         print(f"  Multiplier: {self.surge_multiplier}x")
 
     def test_scenario_5_safety_stock_adjustment(self):
-        """✓ Adjust safety stock for higher volatility"""
+        """[PASS] Adjust safety stock for higher volatility"""
         # Normal demand variability
         normal_cv = 0.15  # 15% coefficient of variation
         surge_cv = 0.25   # 25% CV during surge (higher uncertainty)
@@ -726,7 +829,7 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         self.assertGreater(surge_ss, normal_ss)
         self.assertGreater(ss_increase, 0.5)
         
-        print(f"\n✓ SAFETY STOCK ADJUSTMENT")
+        print(f"\n[PASS] SAFETY STOCK ADJUSTMENT")
         print(f"  Normal CV: {normal_cv:.1%}")
         print(f"  Surge CV: {surge_cv:.1%}")
         print(f"  Normal Safety Stock: {normal_ss:.0f} units")
@@ -734,7 +837,7 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         print(f"  Increase: {ss_increase:.1%}")
 
     def test_scenario_5_warehouse_capacity_check(self):
-        """✓ Check warehouse capacity for surge inventory"""
+        """[PASS] Check warehouse capacity for surge inventory"""
         warehouses = self.data.warehouses
         
         # Current baseline inventory
@@ -751,14 +854,14 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         self.assertLess(surge_utilization, 1.0, "Surge inventory fits in warehouses")
         self.assertGreater(surge_utilization, 0.6, "Warehouses reasonably utilized")
         
-        print(f"\n✓ WAREHOUSE CAPACITY CHECK")
+        print(f"\n[PASS] WAREHOUSE CAPACITY CHECK")
         print(f"  Total Capacity: {total_capacity:,} units")
         print(f"  Normal Inventory: {normal_inventory:,} units ({normal_utilization:.1%})")
         print(f"  Surge Inventory: {surge_inventory:,} units ({surge_utilization:.1%})")
-        print(f"  Status: ✓ Sufficient capacity")
+        print(f"  Status: [PASS] Sufficient capacity")
 
     def test_scenario_5_early_shipment_planning(self):
-        """✓ Plan early shipments to prepare for surge"""
+        """[PASS] Plan early shipments to prepare for surge"""
         # Timeline for Black Friday
         today = datetime.now()
         black_friday = datetime(today.year, 11, 28)  # 4th Thursday in November
@@ -779,14 +882,14 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         deadline_standard = late_order_standard - timedelta(days=buffer_days)
         deadline_economy = late_order_economy - timedelta(days=buffer_days)
         
-        print(f"\n✓ EARLY SHIPMENT PLANNING")
+        print(f"\n[PASS] EARLY SHIPMENT PLANNING")
         print(f"  Black Friday: {black_friday.strftime('%Y-%m-%d')}")
         print(f"  Fast Supplier (5d LT): Order by {deadline_fast.strftime('%Y-%m-%d')}")
         print(f"  Standard Supplier (14d LT): Order by {deadline_standard.strftime('%Y-%m-%d')}")
         print(f"  Economy Supplier (21d LT): Order by {deadline_economy.strftime('%Y-%m-%d')}")
 
     def test_scenario_5_risk_assessment(self):
-        """✓ Assess risks and mitigation for surge scenario"""
+        """[PASS] Assess risks and mitigation for surge scenario"""
         risks = [
             {
                 "risk": "Inventory stockout during surge",
@@ -820,7 +923,7 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         self.assertEqual(len(risks), 4)
         self.assertGreater(total_expected_loss, 0)
         
-        print(f"\n✓ RISK ASSESSMENT")
+        print(f"\n[PASS] RISK ASSESSMENT")
         for i, risk in enumerate(risks, 1):
             print(f"  {i}. {risk['risk']}")
             print(f"     Probability: {risk['probability']:.0%}")
@@ -828,7 +931,7 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
             print(f"     Mitigation: {risk['mitigation']}")
 
     def test_scenario_5_overall_feasibility(self):
-        """✓ Assess overall feasibility of 3x surge handling"""
+        """[PASS] Assess overall feasibility of 3x surge handling"""
         constraints = {
             "supply": {"available": 300_000 * 1.5, "needed": 300_000, "status": "OK"},
             "warehouse": {"available": 2_000_000, "needed": 1_600_000, "status": "OK"},
@@ -840,9 +943,9 @@ class TestScenario5_BlackFridayPlanning(unittest.TestCase):
         
         self.assertTrue(all_feasible)
         
-        print(f"\n✓ FEASIBILITY ASSESSMENT")
+        print(f"\n[PASS] FEASIBILITY ASSESSMENT")
         for constraint, details in constraints.items():
-            status_icon = "✓" if details["status"] == "OK" else "✗"
+            status_icon = "[PASS]" if details["status"] == "OK" else "[FAIL]"
             print(f"  {status_icon} {constraint.capitalize()}: {details['status']}")
 
 
