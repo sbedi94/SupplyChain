@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Dict
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from src.tools.forecast_cache import ForecastCache, FallbackForecaster
 
@@ -19,13 +20,20 @@ load_dotenv()
 
 # Initialize LLM
 api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+open_api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
 if not api_key:
-    raise ValueError("Google API key not found")
+    raise ValueError("OpenAI API key not found")
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash",
+#     temperature=0,
+#     api_key=api_key
+# )
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
     temperature=0,
-    api_key=api_key
+    openai_api_key=open_api_key
 )
 
 # Initialize cache

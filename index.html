@@ -248,6 +248,31 @@
             display: flex;
             gap: 10px;
             border-bottom: 2px solid #e5e7eb;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .metrics-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .metrics-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .metrics-table tr:hover {
+            background: #f9fafb;
             margin-bottom: 15px;
         }
 
@@ -470,6 +495,21 @@
 
         async function submitReview(decision) {
             try {
+                const btnApprove = document.getElementById('approveBtn');
+                const btnReject = document.getElementById('rejectBtn');
+                const oldApproveText = btnApprove.textContent;
+                const oldRejectText = btnReject.textContent;
+                
+                // Disable review buttons during submission
+                btnApprove.disabled = true;
+                btnReject.disabled = true;
+                
+                if (decision === 'approve') {
+                    btnApprove.innerHTML = '<span class="loading"></span> Approving...';
+                } else {
+                    btnReject.innerHTML = '<span class="loading"></span> Rejecting...';
+                }
+                
                 const response = await fetch(`${API_BASE}/human-review`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -477,9 +517,42 @@
                 });
 
                 const data = await response.json();
-                displayStatus('success', `✅ Review Submitted: ${decision.toUpperCase()}`, data);
+                
+                if (data.status === 'success') {
+                    if (decision === 'approve') {
+                        // Hide review buttons after approval
+                        btnApprove.style.display = 'none';
+                        btnReject.style.display = 'none';
+                        
+                        // Display final state and results
+                        if (data.final_state) {
+                            displayStatus('success', `✅ Approval Confirmed! Pipeline completed successfully.`, data.final_state);
+                            displayFinalResults(data.final_state);
+                        } else {
+                            displayStatus('success', `✅ Approval Confirmed!`, data);
+                        }
+                    } else if (decision === 'reject') {
+                        // Hide review buttons after rejection
+                        btnApprove.style.display = 'none';
+                        btnReject.style.display = 'none';
+                        
+                        displayStatus('error', `❌ Plan Rejected. Please review and re-run pipeline.`, data);
+                    }
+                } else {
+                    displayStatus('error', '❌ Review submission failed: ' + data.message);
+                    // Re-enable buttons on error
+                    btnApprove.disabled = false;
+                    btnReject.disabled = false;
+                    btnApprove.textContent = oldApproveText;
+                    btnReject.textContent = oldRejectText;
+                }
             } catch (error) {
                 displayStatus('error', '❌ Error: ' + error.message);
+                // Re-enable buttons on error
+                document.getElementById('approveBtn').disabled = false;
+                document.getElementById('rejectBtn').disabled = false;
+                document.getElementById('approveBtn').textContent = '✓ Approve';
+                document.getElementById('rejectBtn').textContent = '✗ Reject';
             }
         }
 
@@ -504,6 +577,77 @@
                 document.getElementById('metricProcurement').textContent = summary.procurement_items || 0;
                 document.getElementById('metricAlerts').textContent = summary.total_alerts || 0;
             }
+        }
+
+        function displayFinalMetrics(finalState) {
+            if (finalState && finalState.metrics) {
+                const metrics = finalState.metrics;
+                
+                let html = '<h4>📊 Final Metrics</h4>';
+                html += '<table class="metrics-table">';
+                html += '<tr><th>Metric</th><th>Value</th></tr>';
+                
+                for (const [key, value] of Object.entries(metrics)) {
+                    const displayKey = key.replace(/_/g, ' ').toUpperCase();
+                    html += `<tr><td>${displayKey}</td><td>${typeof value === 'number' ? value.toFixed(2) : value}</td></tr>`;
+                }
+                
+                html += '</table>';
+                
+                document.getElementById('metricsOutput') = html;
+                switchTab('metrics');
+            }
+        }
+
+        function displayFinalResults(finalState) {
+            if (!finalState) return;
+            
+            // Extract and display final inventory plan
+            if (finalState.final_inventory_plan && Array.isArray(finalState.final_inventory_plan)) {
+                let html = '<h4>✅ Final Inventory Plan</h4>';
+                html += '<table class="metrics-table">';
+                html += '<tr><th>Store</th><th>SKU</th><th>Qty</th><th>Cost</th></tr>';
+                
+                const plan = finalState.final_inventory_plan;
+                const displayLimit = Math.min(10, plan.length);
+                
+                for (let i = 0; i < displayLimit; i++) {
+                    const item = plan[i];
+                    html += `<tr>
+                        <td>${item.store_id || item[0]}</td>
+                        <td>${item.sku_id || item[1]}</td>
+                        <td>${item.recommended_order_qty || item[2]}</td>
+                        <td>$${item.total_cost ? item.total_cost.toFixed(2) : 0}</td>
+                    </tr>`;
+                }
+                
+                if (plan.length > 10) {
+                    html += `<tr><td colspan="4" style="text-align: center; padding: 10px;"><em>... and ${plan.length - 10} more items</em></td></tr>`;
+                }
+                
+                html += '</table>';
+                document.getElementById('inventoryOutput').innerHTML = html;
+            }
+            
+            // Display metrics
+            if (finalState.metrics) {
+                let metricsHtml = '<h4>📊 Final Metrics</h4>';
+                metricsHtml += '<table class="metrics-table">';
+                metricsHtml += '<tr><th>Metric</th><th>Value</th></tr>';
+                
+                for (const [key, value] of Object.entries(finalState.metrics)) {
+                    const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    metricsHtml += `<tr><td>${displayKey}</td><td>${typeof value === 'number' ? value.toFixed(2) : value}</td></tr>`;
+                }
+                
+                metricsHtml += '</table>';
+                document.getElementById('metricsOutput').innerHTML = metricsHtml;
+            }
+            
+            // Switch to inventory tab to show results
+            setTimeout(() => {
+                switchTab('inventory');
+            }, 500);
         }
 
         function displayAlerts(alerts, escalations) {
@@ -545,10 +689,10 @@
             const tab = document.getElementById(tabName);
             if (tab) {
                 tab.classList.add('active');
+                
+                // Set active tab button
+                event.target.classList.add('active');
             }
-            
-            // Set active tab button
-            event.target.classList.add('active');
 
             // Populate content
             if (pipelineData) {
