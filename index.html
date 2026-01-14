@@ -358,17 +358,25 @@
                 <div class="card">
                     <div class="tabs">
                         <button class="tab active" onclick="switchTab('alerts')">⚠️ Alerts</button>
-                        <button class="tab" onclick="switchTab('forecasts')">📈 Forecasts</button>
-                        <button class="tab" onclick="switchTab('inventory')">📦 Inventory</button>
-                        <button class="tab" onclick="switchTab('suppliers')">🤝 Suppliers</button>
-                        <button class="tab" onclick="switchTab('logistics')">🚚 Logistics</button>
-                        <button class="tab" onclick="switchTab('metrics')">📊 Metrics</button>
+                        <button class="tab" id="raw-response" onclick="switchTab('raw-data')"> Logs</button>
+                        <button class="tab" id="f-response" onclick="switchTab('forecasts')">📈 Forecasts</button>
+                        <button class="tab" id="i-response" onclick="switchTab('inventory')">📦 Inventory</button>
+                        <button class="tab" id="s-response" onclick="switchTab('suppliers')">🤝 Suppliers</button>
+                        <button class="tab" id="l-response" onclick="switchTab('logistics')">🚚 Logistics</button>
+                        <button class="tab" id="m-response" onclick="switchTab('metrics')">📊 Metrics</button>
                     </div>
 
                     <div id="alerts" class="tab-content active">
                         <div class="card-title">⚠️ Alerts & Escalations</div>
                         <div id="alertsOutput">
                             <p style="color: #999;">Run pipeline to view alerts</p>
+                        </div>
+                    </div>
+
+                    <div id="raw-data" class="tab-content">
+                        <div class="card-title">📈 Raw Data</div>
+                        <div id="rawDataOutput">
+                            <p style="color: #999;">Run pipeline to view raw data</p>
                         </div>
                     </div>
 
@@ -420,6 +428,7 @@
                                 <div class="metric-value" id="metricAlerts">0</div>
                             </div>
                         </div>
+                        <div class="metrics" id="metricsOutput"></div>
                     </div>
                 </div>
             </div>
@@ -628,6 +637,107 @@
                 html += '</table>';
                 document.getElementById('inventoryOutput').innerHTML = html;
             }
+
+            if (finalState.forecasts && Array.isArray(finalState.forecasts)) {
+                let html = '<h4>✅ Final Demand Forcast</h4>';
+                html += '<table class="metrics-table">';
+                html += '<tr><th>Store</th><th>SKU</th><th>Forcast</th><th>Horizon Day</th><th>Seasonality Pattern</th></tr>';
+                
+                const plan = finalState.forecasts;
+                const displayLimit = Math.min(10, plan.length);
+                
+                for (let i = 0; i < displayLimit; i++) {
+                    const item = plan[i];
+                    html += `<tr>
+                        <td>${item.store_id || item[0]}</td>
+                        <td>${item.sku_id || item[1]}</td>
+                        <td>${item.forecast || item[2]}</td>
+                        <td>${item.horizon_day || item[3]}</td>
+                        <td>${item.seasonality_pattern || item[4]}</td>
+                    </tr>`;
+                }
+                
+                if (plan.length > 10) {
+                    html += `<tr><td colspan="4" style="text-align: center; padding: 10px;"><em>... and ${plan.length - 10} more items</em></td></tr>`;
+                }
+                
+                html += '</table>';
+                document.getElementById('forecastsOutput').innerHTML = html;
+            }
+
+            if (finalState.logistics_plan && Array.isArray(finalState.logistics_plan)) {
+                let html = '<h4>✅ Final Logistics Plan</h4>';
+                html += '<table class="metrics-table">';
+                html += '<tr>\
+                            <th>ID</th>\
+                            <th>Warehouse name</th>\
+                            <th>Location</th>\
+                            <th>Quantity</th>\
+                            <th>Shipments</th>\
+                            <th>Shipments capacity</th>\
+                            <th>Estimated Days</th>\
+                        </tr>';
+                
+                const plan = finalState.logistics_plan;
+                const displayLimit = plan.length;
+                
+                for (let i = 0; i < displayLimit; i++) {
+                    const item = plan[i];
+                    html += `<tr>
+                        <td>${item.warehouse_id || item[0]}</td>
+                        <td>${item.warehouse_name || item[1]}</td>
+                        <td>${item.location || item[2]}</td>
+                        <td>${item.quantity || item[3]}</td>
+                        <td>${item.shipments || item[4]}</td>
+                        <td>${item.shipment_capacity || item[5]}</td>
+                        <td>${item.estimated_days || item[6]}</td>
+                    </tr>`;
+                }
+                
+                if (plan.length > 10) {
+                    html += `<tr><td colspan="4" style="text-align: center; padding: 10px;"><em>... and ${plan.length - 10} more items</em></td></tr>`;
+                }
+                
+                html += '</table>';
+                document.getElementById('logisticsOutput').innerHTML = html;
+            }
+
+            if (finalState.supplier_status && Array.isArray(finalState.supplier_status)) {
+                let html = '<h4>✅ Final Supplier Status</h4>';
+                html += '<table class="metrics-table">';
+                html += '<tr>\
+                            <th>ID</th>\
+                            <th>Name</th>\
+                            <th>Location</th>\
+                            <th>Status</th>\
+                            <th>Capacity</th>\
+                            <th>Cost per unit</th>\
+                            <th>Reliability Score</th>\
+                        </tr>';
+                
+                const plan = finalState.supplier_status;
+                const displayLimit = plan.length;
+                
+                for (let i = 0; i < displayLimit; i++) {
+                    const item = plan[i];
+                    html += `<tr>
+                        <td>${item.supplier_id || item[0]}</td>
+                        <td>${item.name || item[1]}</td>
+                        <td>${item.location || item[2]}</td>
+                        <td>${item.status || item[3]}</td>
+                        <td>${item.capacity || item[4]}</td>
+                        <td>${item.cost_per_unit || item[5]}</td>
+                        <td>${item.reliability_score || item[6]}</td>
+                    </tr>`;
+                }
+                
+                if (plan.length > 10) {
+                    html += `<tr><td colspan="4" style="text-align: center; padding: 10px;"><em>... and ${plan.length - 10} more items</em></td></tr>`;
+                }
+                
+                html += '</table>';
+                document.getElementById('suppliersOutput').innerHTML = html;
+            }
             
             // Display metrics
             if (finalState.metrics) {
@@ -656,7 +766,15 @@
             if (escalations && escalations.length > 0) {
                 html += '<h4>🚨 Escalations</h4>';
                 escalations.forEach(e => {
-                    html += `<div class="alert alert-danger">${e}</div>`;
+                    html += `
+                        <div class="alert alert-danger">
+                            <strong>${e.severity}</strong> – ${e.reason}<br/>
+                            <small>
+                                Supplier: ${e.supplier} (${e.supplier_id})<br/>
+                                Action: ${e.action_required}
+                            </small>
+                        </div>
+                    `;
                 });
             }
             
@@ -667,7 +785,7 @@
                 });
             }
             
-            if (!alerts && !escalations) {
+            if (!alerts && !escalations && alerts.length && escalations.length === 0) {
                 html = '<p style="color: #999;">No alerts or escalations</p>';
             }
             
@@ -696,19 +814,23 @@
 
             // Populate content
             if (pipelineData) {
-                if (tabName === 'forecasts') {
-                    document.getElementById('forecastsOutput').innerHTML = 
-                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
-                } else if (tabName === 'inventory') {
-                    document.getElementById('inventoryOutput').innerHTML = 
-                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
-                } else if (tabName === 'suppliers') {
-                    document.getElementById('suppliersOutput').innerHTML = 
-                        `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
-                } else if (tabName === 'logistics') {
-                    document.getElementById('logisticsOutput').innerHTML = 
+                if (tabName === 'raw-data') {
+                    document.getElementById('rawDataOutput').innerHTML = 
                         `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
                 }
+                // if (tabName === 'forecasts') {
+                //     document.getElementById('forecastsOutput').innerHTML = 
+                //         `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                // } else if (tabName === 'inventory') {
+                //     document.getElementById('inventoryOutput').innerHTML = 
+                //         `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                // } else if (tabName === 'suppliers') {
+                //     document.getElementById('suppliersOutput').innerHTML = 
+                //         `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                // } else if (tabName === 'logistics') {
+                //     document.getElementById('logisticsOutput').innerHTML = 
+                //         `<pre>${JSON.stringify(pipelineData, null, 2)}</pre>`;
+                // }
             }
         }
 

@@ -146,7 +146,7 @@ async def run_pipeline():
         pipeline_paused = False
         result = workflow.invoke(initial_state)
         pipeline_state = result
-
+        print(result)
         return {
             "status": "success",
             "message": "Pipeline executed successfully - awaiting approval",
