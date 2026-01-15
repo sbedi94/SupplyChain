@@ -28,19 +28,22 @@ Write-Host ""
 # Start the server
 Write-Host ""
 Write-Host "========================================"
-Write-Host "  Starting SupplyChain Server" -ForegroundColor Green
+Write-Host "  Starting SupplyChain Backend Server" -ForegroundColor Green
 Write-Host "========================================"
 Write-Host ""
-Write-Host "Server starting on http://localhost:8000" -ForegroundColor Green
+Write-Host "Backend Server starting on http://localhost:8000" -ForegroundColor Green
 Write-Host ""
-Write-Host "Open your browser to:" -ForegroundColor Cyan
-Write-Host "  http://localhost:8000" -ForegroundColor Green
+Write-Host "🌐 IMPORTANT - Frontend Server Needed:" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "   Open ANOTHER PowerShell terminal and run:" -ForegroundColor Cyan
+Write-Host "   python -m http.server 8001 --directory ." -ForegroundColor Green
+Write-Host ""
+Write-Host "   Then access the UI at: http://localhost:8001/index.html" -ForegroundColor Green
 Write-Host ""
 Write-Host "API Documentation available at:" -ForegroundColor Cyan
 Write-Host "  http://localhost:8000/docs        (Swagger UI)" -ForegroundColor Green
-Write-Host "  http://localhost:8000/redoc       (ReDoc)" -ForegroundColor Green
 Write-Host ""
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host ""
 
-python server.py
+uvicorn server:app --host 0.0.0.0 --port 8000

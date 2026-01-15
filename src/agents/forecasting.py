@@ -4,14 +4,21 @@ import os
 import re
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from sambanova import SambaNova
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash",
+#     temperature=0
+# )
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0,
+    openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
 # client = SambaNova(
@@ -53,8 +60,8 @@ def forecasting_agent(state):
     print("Starting forecasting...")
     print(f"Total store-SKU combinations to forecast: {df[['store_id', 'sku_id']].drop_duplicates().shape[0]}")
     for (store, sku), g in df.groupby(["store_id", "sku_id"]):
-        if len(forecasts) >= 5 * 7:  # 5 items × 7 days each
-            break
+        # if len(forecasts) >= 5 * 7:  # 5 items × 7 days each
+        #     break
         recent = g.sort_values("date").tail(30)
 
         history_text = "\n".join(
