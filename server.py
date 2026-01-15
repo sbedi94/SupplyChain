@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 import traceback
 import uvicorn
+import asyncio
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -21,13 +22,15 @@ from graph import create_workflow
 
 app = FastAPI(title="SupplyChain Planning System", version="1.0.0")
 
-# Enable CORS
+# Enable CORS with proper configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8001", "http://127.0.0.1:8001", "http://localhost:8000", "http://127.0.0.1:8000"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*", "Content-Type"],
+    max_age=3600,
+    expose_headers=["*"],
 )
 
 # Pydantic models for request/response

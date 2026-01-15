@@ -622,6 +622,10 @@
 
                     <div id="tests" class="tab-content">
                         <div class="card-title">🧪 Enterprise Test Scenarios</div>
+                        <div class="alert alert-info" style="margin-bottom: 20px;">
+                            <strong>ℹ️ Important:</strong> Running tests takes 2-5 minutes per scenario (all 25 tests: 5+ minutes). 
+                            Please be patient and do not refresh the page. The API will remain responsive during execution.
+                        </div>
                         <div id="testsOutput">
                             <p style="color: #999;">Click buttons to run tests</p>
                         </div>
@@ -1069,10 +1073,24 @@
                 if (data.status === 'success') {
                     displayTestResults(data, resultsDiv, scenario);
                 } else {
-                    resultsDiv.innerHTML = `<div class="alert alert-danger">Test failed: ${data.message}</div>`;
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">
+                        <strong>Test Error:</strong> ${data.message}
+                        <p style="margin-top: 10px; font-size: 0.9em;">
+                            Tip: Tests can take 2-5 minutes to complete. If timeout occurs, tests are still running on the server.
+                        </p>
+                    </div>`;
                 }
             } catch (error) {
-                resultsDiv.innerHTML = `<div class="alert alert-danger">Error running test: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<div class="alert alert-danger">
+                    <strong>Error running test:</strong> ${error.message}
+                    <p style="margin-top: 10px; font-size: 0.9em;">
+                        Troubleshooting:
+                        <br>1. Ensure FastAPI server is running on http://localhost:8000
+                        <br>2. Check browser console (F12) for CORS errors
+                        <br>3. Wait 5+ minutes for tests to complete
+                    </p>
+                </div>`;
+                console.error('Test error:', error);
             }
 
             btn.disabled = false;
@@ -1085,7 +1103,7 @@
             const btn = document.getElementById('runAllTestsBtn');
             const oldText = btn.textContent;
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Running All...';
+            btn.innerHTML = '<span class="loading"></span> Running All (5+ min)...';
 
             try {
                 const response = await fetch(`${API_BASE}/tests/run`, {
@@ -1099,10 +1117,25 @@
                 if (data.status === 'success') {
                     displayAllTestResults(data, resultsDiv);
                 } else {
-                    resultsDiv.innerHTML = `<div class="alert alert-danger">Tests failed: ${data.message}</div>`;
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">
+                        <strong>Test Error:</strong> ${data.message}
+                        <p style="margin-top: 10px; font-size: 0.9em;">
+                            All 25 tests take 5+ minutes to complete. Please wait patiently.
+                        </p>
+                    </div>`;
                 }
             } catch (error) {
-                resultsDiv.innerHTML = `<div class="alert alert-danger">Error running tests: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<div class="alert alert-danger">
+                    <strong>Error running tests:</strong> ${error.message}
+                    <p style="margin-top: 10px; font-size: 0.9em;">
+                        Troubleshooting:
+                        <br>1. Ensure FastAPI server is running on http://localhost:8000
+                        <br>2. Check browser console (F12) for CORS errors
+                        <br>3. Running all 25 tests requires 5+ minutes
+                        <br>4. Do NOT close browser while tests run
+                    </p>
+                </div>`;
+                console.error('Tests error:', error);
             }
 
             btn.disabled = false;
