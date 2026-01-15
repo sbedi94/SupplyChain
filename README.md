@@ -18,7 +18,34 @@ An AI-powered supply chain optimization platform that uses LangGraph with multi-
 - 📈 Reducing overstock via budget constraints + intelligent strategy selection
 - 🔄 Providing graceful degradation when LLM APIs fail
 
----
+## 🔄 The Workflow: How Data Flows
+
+**File:** `src/graph.py`
+
+### Conceptual Diagram
+
+```
+Load Data
+    ↓
+Profile Data (clean, sort)
+    ↓
+Feature Engineering (add calculated columns)
+    ↓
+Demand Forecasting (LLM or statistical)
+    ↓
+Inventory Optimization (calculate safety stock & ROP)
+    ↓
+Supplier Procurement (check status, find alternatives)
+    ↓
+Logistics Capacity (plan shipments)
+    ↓
+Human Review (approve/modify/reject)
+    ↓
+[if approved] Evaluation (calculate metrics)
+    ↓
+END
+```
+
 
 ## 🎯 Quick Start (2 Minutes)
 
