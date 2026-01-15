@@ -455,7 +455,7 @@ class TestRequest(BaseModel):
 
 @app.post("/api/tests/run")
 async def run_tests(request: TestRequest):
-    """Execute test scenarios and return results"""
+    """Execute test scenarios and return results (async with timeout)"""
     import subprocess
     import json
     from datetime import datetime
@@ -463,13 +463,33 @@ async def run_tests(request: TestRequest):
     try:
         if request.run_all:
             # Run all tests
-            cmd = ['python', 'tests/test_enterprise_scenarios.py']
+            cmd = ['python', '-m', 'unittest', 'tests.test_enterprise_scenarios', '-v']
         else:
-            # Run specific scenario test
-            cmd = ['python', '-m', 'unittest', f'tests.test_enterprise_scenarios.TestScenario{request.scenario_id.split("scenario")[1].capitalize()}_*', '-v']
+            # Run specific scenario test - extract scenario number
+            scenario_num = request.scenario_id.split("scenario")[1] if request.scenario_id else "1"
+            # Map scenario numbers to class names
+            scenario_classes = {
+                "1": "TestScenario1_Q2Planning",
+                "2": "TestScenario2_SupplierCrisis",
+                "3": "TestScenario3_ERPSystemDown",
+                "4": "TestScenario4_BudgetOverrun",
+                "5": "TestScenario5_BlackFridayPlanning"
+            }
+            class_name = scenario_classes.get(scenario_num, "TestScenario1_Q2Planning")
+            cmd = ['python', '-m', 'unittest', f'tests.test_enterprise_scenarios.{class_name}', '-v']
         
-        # Execute tests
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd=os.path.dirname(__file__))
+        # Execute tests with timeout (300 seconds = 5 minutes max) - async non-blocking
+        try:
+            result = await asyncio.wait_for(
+                asyncio.to_thread(subprocess.run, cmd, capture_output=True, text=True, cwd=os.path.dirname(__file__)),
+                timeout=300.0
+            )
+        except asyncio.TimeoutError:
+            return {
+                "status": "error",
+                "message": "Test execution exceeded 5-minute timeout. Tests are still running - try again in a moment.",
+                "timestamp": datetime.now().isoformat()
+            }
         
         # Parse test output
         output = result.stdout + result.stderr
@@ -518,16 +538,19 @@ def parse_test_output(output, run_all, scenario_id):
         success_rate = 0
     
     # Extract individual test results
-    test_pattern = r'(\w+.*?) \((.*?)\) \.\.\. (ok|FAIL|ERROR)'
-    test_matches = re.findall(test_pattern, output)
+    # Pattern handles: test_name (full.class.path) ... ok/FAIL/ERROR
+    # Also handles multiline output where class path wraps to next line
+    # DOTALL flag makes . match newlines
+    test_pattern = r'(test_[\w_]+)\s*\(([^)]*)\)(?:\n\[PASS\][^\n]*)?\s*\.\.\.\s*(ok|FAIL|ERROR)'
+    test_matches = re.findall(test_pattern, output, re.DOTALL)
     
     tests = []
     for match in test_matches:
         test_name, test_class, status = match
         tests.append({
-            "name": test_name,
-            "class": test_class,
-            "passed": status == 'ok',
+            "name": test_name.strip(),
+            "class": test_class.strip(),
+            "passed": status.lower() == 'ok',
             "status": status,
             "message": f"Test {status.lower()}"
         })

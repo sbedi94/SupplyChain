@@ -1059,13 +1059,14 @@
             const btn = event.target;
             const oldText = btn.textContent;
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Running...';
+            btn.innerHTML = '<span class="loading"></span> Running (2-3 min)...';
 
             try {
                 const response = await fetch(`${API_BASE}/tests/run`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scenario_id: scenario })
+                    body: JSON.stringify({ scenario_id: scenario }),
+                    timeout: 310000
                 });
 
                 const data = await response.json();
@@ -1109,7 +1110,8 @@
                 const response = await fetch(`${API_BASE}/tests/run`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ run_all: true })
+                    body: JSON.stringify({ run_all: true }),
+                    timeout: 310000
                 });
 
                 const data = await response.json();
@@ -1144,33 +1146,23 @@
         }
 
         function displayTestResults(data, resultsDiv, scenario) {
+            const scenarioNames = {
+                'scenario1': 'Q2 Inventory Planning',
+                'scenario2': 'Supplier Crisis',
+                'scenario3': 'ERP System Down',
+                'scenario4': 'Budget Overrun',
+                'scenario5': 'Black Friday Planning'
+            };
+            const displayName = scenarioNames[scenario] || scenario;
+            
+            // Debug logging
+            console.log('Test results data:', data);
+            console.log('Tests array:', data.tests);
+            console.log('Tests count:', data.tests ? data.tests.length : 'undefined');
+            
             let html = `<div class="card">
-                <div class="card-title">✅ Test Results - ${scenario.toUpperCase()}</div>
-                <div class="metrics-table-wrapper" style="overflow-x: auto;">
-                    <table class="metrics-table">
-                        <tr>
-                            <th>Test Name</th>
-                            <th>Status</th>
-                            <th>Duration (s)</th>
-                            <th>Details</th>
-                        </tr>`;
-
-            if (data.tests && Array.isArray(data.tests)) {
-                data.tests.forEach(test => {
-                    const statusClass = test.passed ? 'status-success' : 'status-error';
-                    const statusIcon = test.passed ? '✓' : '✗';
-                    html += `<tr>
-                        <td>${test.name}</td>
-                        <td><span class="status-badge ${statusClass}">${statusIcon} ${test.passed ? 'PASS' : 'FAIL'}</span></td>
-                        <td>${test.duration ? test.duration.toFixed(2) : 'N/A'}</td>
-                        <td>${test.message || 'Test executed'}</td>
-                    </tr>`;
-                });
-            }
-
-            html += `</table>
-                </div>
-                <div class="metrics" style="margin-top: 15px;">
+                <div class="card-title">✅ Test Results - ${displayName}</div>
+                <div class="metrics" style="margin-bottom: 20px;">
                     <div class="metric">
                         <div class="metric-label">Total Tests</div>
                         <div class="metric-value">${data.total_tests || 0}</div>
@@ -1187,6 +1179,38 @@
                         <div class="metric-label">Success Rate</div>
                         <div class="metric-value">${data.success_rate ? (data.success_rate * 100).toFixed(1) + '%' : '0%'}</div>
                     </div>
+                    <div class="metric">
+                        <div class="metric-label">Duration</div>
+                        <div class="metric-value">${data.duration ? data.duration.toFixed(1) + 's' : 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="metrics-table-wrapper" style="overflow-x: auto;">
+                    <table class="metrics-table">
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>`;
+
+            if (data.tests && Array.isArray(data.tests) && data.tests.length > 0) {
+                data.tests.forEach(test => {
+                    const statusClass = test.passed ? 'status-success' : 'status-error';
+                    const statusIcon = test.passed ? '✓' : '✗';
+                    const testName = test.name ? test.name.replace(/_/g, ' ').replace('test ', '') : 'Unknown';
+                    html += `<tr>
+                        <td><strong>${testName}</strong></td>
+                        <td><span class="status-badge ${statusClass}">${statusIcon} ${test.passed ? 'PASS' : 'FAIL'}</span></td>
+                        <td>${test.message || 'Test executed successfully'}</td>
+                    </tr>`;
+                });
+            } else {
+                html += `<tr><td colspan="3" style="text-align: center; color: #999;">
+                    No test details found. Check browser console (F12) for debugging information.
+                    <br><small>Raw data: ${JSON.stringify(data.tests).substring(0, 100)}...</small>
+                </td></tr>`;
+            }
+
+            html += `</table>
                 </div>
             </div>`;
 
